@@ -1,0 +1,7 @@
+- Separación por feature module
+- TailwindCSS y DaisyUI
+- Assets estáticos como imágenes y fuentes
+- Peticiones HTTP
+- Variables de entorno
+- Pipes personalizados
+- Señales y recursos (rxResources)
