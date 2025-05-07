@@ -5,3 +5,7 @@
 - Variables de entorno
 - Pipes personalizados
 - Señales y recursos (rxResources)
+- Paginación via URL
+- Re-utilización de componentes y servicios
+- Caché de productos y producto
+- Organización de archivos y directorios

@@ -6,7 +6,7 @@
     @for (img of images(); track $index) {
     <!-- Slides -->
     <div class="swiper-slide">
-      <img [src]="img | productImage" alt="producto">
+      <img [src]="img | productImage" alt="producto" class="w-full object cover animate-fadeIn">
     </div>
     }
 
