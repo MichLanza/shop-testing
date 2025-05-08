@@ -2,7 +2,8 @@
     "angular-schematics.schematicsDefaultOptions": {
         "angular-*": {
             "inlineStyle": true,
-            "externalTemplate": true
+            "externalTemplate": true,
+            "skipStyle": true
         },
         "angular-component": {
             "skipChangeDetectionOnPush": true

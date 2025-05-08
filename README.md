@@ -9,3 +9,9 @@
 - Re-utilización de componentes y servicios
 - Caché de productos y producto
 - Organización de archivos y directorios
+- Crear un login basado en JWTs
+- Guards
+- Interceptores
+- Autenticar peticiones
+- Controlar quien puede ver una ruta o no
+- Usar el principio DRY
