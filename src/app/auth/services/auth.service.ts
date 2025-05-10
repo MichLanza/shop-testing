@@ -12,6 +12,7 @@ const baseUrl = 'http://localhost:3000/api'
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
+
   private _authStatus = signal<AuthStatus>('checking');
   private _user = signal<User | null>(null);
   private _token = signal<string | null>(localStorage.getItem('token'));
@@ -56,6 +57,19 @@ export class AuthService {
       );
   }
 
+
+  register(email: string, password: string , fullName : string): Observable<boolean>{
+    return this.httpClient.post<AuthResponse>(`${baseUrl}/auth/register`, {
+      email: email,
+      password: password,
+      fullName : fullName
+    })
+      .pipe(
+        map(resp => this.handleAuthSuccess(resp)),
+        catchError((error: any) => this.handleAuthError(error)),
+      );
+  }
+
   logout() {
     this._authStatus.set('not-authenticated');
     this._user.set(null);
@@ -64,7 +78,6 @@ export class AuthService {
   }
 
   private handleAuthSuccess(resp: AuthResponse) {
-
     this._authStatus.set('authenticated');
     this._user.set(resp.user);
     this._token.set(resp.token);
