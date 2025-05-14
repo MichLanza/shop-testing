@@ -1,20 +1,23 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductCarrouselComponent } from '@products/components/product-carrousel/product-carrousel.component';
 import { Product } from '@products/interfaces/product-response.interface';
 import { FormUtils } from 'src/app/utils/form-utils';
+import { FormErrorLabelComponent } from "../../../../shared/components/form-error-label/form-error-label.component";
+import { ProductsService } from '../../../../products/services/products.service';
+import { Router } from '@angular/router';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'product-details',
-  imports: [ProductCarrouselComponent, ReactiveFormsModule],
+  imports: [ProductCarrouselComponent, ReactiveFormsModule, FormErrorLabelComponent],
   templateUrl: './product-details.component.html',
 })
 export class ProductDetailsComponent implements OnInit {
 
-
   product = input.required<Product>();
   fb = inject(FormBuilder);
-
+  route = inject(Router);
   productForm = this.fb.group({
     title: ['', Validators.required],
     description: ['', Validators.required],
@@ -28,7 +31,9 @@ export class ProductDetailsComponent implements OnInit {
 
   });
 
+  saved = signal(false);
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
+  productService = inject(ProductsService);
   ngOnInit(): void {
     this.setFormValue(this.product());
   }
@@ -51,7 +56,29 @@ export class ProductDetailsComponent implements OnInit {
 
 
 
-  onSubmit() {
-    console.log(this.productForm.value);
+  async onSubmit() {
+    const isVaild = this.productForm.valid;
+    this.productForm.markAllAsTouched();
+    if (!isVaild) return;
+    const formValue = this.productForm.value;
+    const productLike: Partial<Product> = {
+      ...(formValue as any), tags: formValue.tags?.toLowerCase().split(',').map(tag => tag.trim()) ?? [],
+    };
+
+    if (this.product().id === 'new') {
+      const product = await firstValueFrom(
+        this.productService.createProduct(productLike)
+      );
+      this.route.navigate(['/admin/products', product.id]);
+
+    } else {
+     await firstValueFrom(this.productService.updateProduct(this.product().id, productLike));
+    }
+
+    this.saved.set(true);
+    setTimeout(() => {
+      this.saved.set(false);
+    }, 3000);
+
   }
 }
