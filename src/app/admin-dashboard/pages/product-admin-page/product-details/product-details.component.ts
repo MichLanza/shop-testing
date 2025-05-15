@@ -1,4 +1,4 @@
-import { Component, inject, input, OnInit, signal } from '@angular/core';
+import { Component, computed, inject, input, OnInit, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { ProductCarrouselComponent } from '@products/components/product-carrousel/product-carrousel.component';
 import { Product } from '@products/interfaces/product-response.interface';
@@ -14,7 +14,6 @@ import { firstValueFrom } from 'rxjs';
   templateUrl: './product-details.component.html',
 })
 export class ProductDetailsComponent implements OnInit {
-
   product = input.required<Product>();
   fb = inject(FormBuilder);
   route = inject(Router);
@@ -31,7 +30,15 @@ export class ProductDetailsComponent implements OnInit {
 
   });
 
+
+  imagesToCarousel = computed(() => {
+    const currentImages = [...this.product().images, ...this.tempImages(),];
+    return currentImages;
+  });
+
   saved = signal(false);
+  tempImages = signal<string[]>([]);
+  imageFileList: FileList | undefined = undefined
   sizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL']
   productService = inject(ProductsService);
   ngOnInit(): void {
@@ -67,12 +74,13 @@ export class ProductDetailsComponent implements OnInit {
 
     if (this.product().id === 'new') {
       const product = await firstValueFrom(
-        this.productService.createProduct(productLike)
+        this.productService.createProduct(productLike, this.imageFileList)
       );
+
       this.route.navigate(['/admin/products', product.id]);
 
     } else {
-     await firstValueFrom(this.productService.updateProduct(this.product().id, productLike));
+      await firstValueFrom(this.productService.updateProduct(this.product().id, productLike, this.imageFileList));
     }
 
     this.saved.set(true);
@@ -81,4 +89,18 @@ export class ProductDetailsComponent implements OnInit {
     }, 3000);
 
   }
+
+
+  onFileChange(event: Event) {
+    const fileList = (event.target as HTMLInputElement).files;
+    // this.tempImages.set([]);
+    this.imageFileList = fileList ?? undefined;
+
+    const imageUrls = Array.from(fileList ?? []).map(file => URL.createObjectURL(file));
+    this.tempImages.set(imageUrls);
+
+    if (!fileList) return;
+
+  }
+
 }

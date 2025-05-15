@@ -27,3 +27,8 @@
 - RxResource con otros argumentos
 - Manejo de caché
 
+- Carga de imágenes
+- Vista previa de las mismas
+- QuerySelector basado en ViewChild
+- ForkJoin
+- SwitchMap
